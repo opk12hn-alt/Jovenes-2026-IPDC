@@ -18,7 +18,7 @@
 --blue:#0032B9;--blue-d:#00227F;--teal:#1F6E9E;--yellow:#FBD80C;--sand:#FBDBA8;--brown:#9C6E56;--debt:#B3400A;
 --chg:#7A4F36;--ink:#162241;--muted:#5F6C86;
 --salmon:var(--blue-d);--red:var(--blue);--wine:var(--blue-d);--warn:var(--debt);--ok:var(--teal);--okbg:rgba(31,110,158,.06);
---serif:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+--serif:Cambria,"Caladea","Cambria Math",Georgia,"Times New Roman",serif}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-feature-settings:"cv11","ss01";min-height:100vh;min-height:100dvh;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -122,6 +122,29 @@ input:focus{outline:2px solid var(--salmon);border-color:transparent}
 .cell b{display:block;font-size:22px;line-height:1.2;font-variant-numeric:tabular-nums;margin-top:1px}
 .cell small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
 .cell.key b{color:var(--blue)}
+.cell.got b{color:#1B7F44}
+.gpn{margin-bottom:14px}
+.gpn h2 small{font-weight:600;color:var(--muted);font-size:13px;margin-left:6px}
+.grw{display:grid;grid-template-columns:1fr;gap:8px}
+.grw input{min-width:0}
+@media (min-width:600px){.grw{grid-template-columns:1fr 140px auto}}
+#gl{margin-top:10px}
+.gi{display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px solid var(--line)}
+.gi .gt{flex:1;min-width:0}.gi .gt b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis}.gi .gt span{font-size:12px;color:var(--muted)}
+.gi .gv{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gi button{border:1px solid var(--line);background:#fff;border-radius:8px;width:36px;height:36px;font-size:15px;cursor:pointer}
+#stG{grid-template-columns:1fr 1fr!important}
+#stG .cell:last-child{grid-column:1/-1;border-top:1px solid var(--line)}
+@media (min-width:600px){#stG{grid-template-columns:repeat(3,1fr)!important}#stG .cell:last-child{grid-column:auto;border-top:0}#stG .cell{border-right:1px solid var(--line)}#stG .cell:last-child{border-right:0}}
+#stG .cell{border-bottom:0!important}
+#stG .cell:nth-child(odd){border-right:1px solid var(--line)}
+.sgl{margin:2px 2px 6px;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#stC .cell.fin{background:linear-gradient(135deg,#EAF3FF,#fff)}
+#stC .cell.fin b{color:var(--blue)}
+#stC .cell.fin b.neg{color:var(--debt)}
+#stG .cell.fin{background:linear-gradient(135deg,#EAF3FF,#fff)}
+#stG .cell.fin b{color:var(--blue)}
+#stG .cell.fin b.neg,#stG .cell b.neg{color:var(--debt)}
 
 /* paneles */
 .cols{display:block}
@@ -384,6 +407,9 @@ label.l{font-weight:600;font-size:13px;display:block;margin-bottom:4px;color:var
 .c-r .c-t{display:block;font-size:12px;color:var(--muted)}
 .n{font-weight:700;font-size:16px;word-break:break-word}
 .s{color:var(--muted);font-size:13px;word-break:break-word}
+.trfb{display:inline-block;margin-top:3px;font-size:12px;font-weight:800;color:#0A6C8F;background:#DDF1FA;border-radius:6px;padding:2px 8px}
+.chk.trf{margin-top:8px}
+.pf{display:block;white-space:nowrap;font-size:12px;font-weight:700;color:#9A6A00;margin-top:2px}.pf.ok{color:#1B7F44}
 .pl{display:inline-block;background:#E6ECF8;color:var(--blue-d);border-radius:6px;padding:2px 9px;font-weight:700;font-size:13px;margin-bottom:3px}
 .tag{font-size:12px;font-weight:700;color:var(--teal);margin-top:2px}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
@@ -489,6 +515,7 @@ a.wabtn{flex:1;display:flex;align-items:center;justify-content:center;border-rad
   .hero-in{padding-top:calc(26px + env(safe-area-inset-top,0px));padding-bottom:26px}
   .strip{grid-template-columns:repeat(4,1fr)}
   #stI,#stM{grid-template-columns:repeat(5,1fr)}
+  #stC{grid-template-columns:repeat(6,1fr)}
   #stI .cell:last-child,#stM .cell:last-child{grid-column:auto}
   .cell,.cell:nth-child(odd),.cell:nth-last-child(-n+2){border:0;border-right:1px solid var(--line)}
   .cell:last-child{border-right:0}
@@ -611,8 +638,10 @@ a.wabtn{flex:1;display:flex;align-items:center;justify-content:center;border-rad
 
 <div id="app" class="wrap hidden">
   <div class="tabs" id="tabs">
+    <button id="t-registro" type="button">Registro</button>
     <button id="t-pedidos" class="on" type="button">Pedidos</button>
-    <button id="t-compras" type="button">Lista de compras</button>
+    <button id="t-compras" type="button" class="hidden">Lista de compras</button>
+    <button id="t-gastos" type="button">Gastos</button>
   </div>
   <h2 class="sect hidden" id="vtitle"></h2>
   <div class="msg" id="gmsg"></div>
@@ -620,6 +649,25 @@ a.wabtn{flex:1;display:flex;align-items:center;justify-content:center;border-rad
   <!-- ============ VENTA DE COMIDA ============ -->
   <section id="p-comida">
     <div class="strip" id="stC"></div>
+    <div class="sh2">Pedidos <small id="npd"></small></div>
+    <div class="bar"><input id="q" type="search" placeholder="Buscar por nombre"><button id="csv">Descargar Excel</button></div>
+    <div class="seg" id="seg">
+      <button data-f="todos" class="on">Todos</button>
+      <button data-f="pend">Por entregar</button>
+      <button data-f="deben">Deben</button>
+      <button data-f="pago">Ya pagaron<span class="cnt" id="npago"></span></button>
+      <button data-f="abono">Abonaron<span class="cnt" id="nabo"></span></button>
+      <button data-f="cambio">Cambio<span class="cnt" id="ncamb"></span></button>
+      <button data-f="canc">Cancelados</button>
+    </div>
+    <div class="list">
+      <div class="thead"><span>Nombre</span><span>Platos</span><span>Monto</span><span></span></div>
+      <div id="lc"></div>
+    </div>
+  </section>
+
+  <!-- ============ REGISTRO ============ -->
+  <section id="p-registro" class="hidden">
     <div class="cols">
       <div class="side">
         <form class="panel" id="fc" autocomplete="off">
@@ -631,6 +679,7 @@ a.wabtn{flex:1;display:flex;align-items:center;justify-content:center;border-rad
             </div>
             <div><label class="l" for="cpg">Recibido ahora (opcional)</label>
               <div class="pay"><input id="cpg" type="number" inputmode="decimal" min="0" step="any" placeholder="0"><button type="button" id="cpt">Pagó todo</button></div>
+              <label class="chk trf"><input type="checkbox" id="ctr"> Pagó por transferencia</label>
               <div class="chg" id="cchg"></div>
               <label class="chk vuelto hidden" id="cchw"><input type="checkbox" id="cchk"> <span id="cchl"></span></label>
             </div>
@@ -647,21 +696,23 @@ a.wabtn{flex:1;display:flex;align-items:center;justify-content:center;border-rad
           <div class="cfg gedit">Meta de venta: <input id="mt" type="number" inputmode="numeric" min="0" step="1" placeholder="0"> platos <button type="button" id="mts">Guardar</button></div>
         </div>
 
-        <div class="sh2">Pedidos <small id="npd"></small></div>
-        <div class="bar"><input id="q" type="search" placeholder="Buscar por nombre"><button id="csv">Descargar Excel</button></div>
-        <div class="seg" id="seg">
-          <button data-f="todos" class="on">Todos</button>
-          <button data-f="pend">Por entregar</button>
-          <button data-f="deben">Deben</button>
-          <button data-f="cambio">Cambio<span class="cnt" id="ncamb"></span></button>
-          <button data-f="canc">Cancelados</button>
-        </div>
-        <div class="list">
-          <div class="thead"><span>Nombre</span><span>Platos</span><span>Monto</span><span></span></div>
-          <div id="lc"></div>
-        </div>
       </div>
     </div>
+  </section>
+
+  <!-- ============ GASTOS ============ -->
+  <section id="p-gastos" class="hidden">
+    <div class="strip" id="stG"></div>
+    <form class="panel gpn" id="fg" autocomplete="off">
+      <h2>Gastos <small id="gcnt"></small></h2>
+      <div class="grw">
+        <input id="gc" type="text" placeholder="¿En qué gastaste? Ej: hielo, gas, bolsas" required aria-label="Concepto">
+        <input id="gm" type="number" inputmode="decimal" min="0" step="any" placeholder="L 0" required aria-label="Monto">
+        <button class="primary" type="submit">Anotar gasto</button>
+      </div>
+      <div id="gerr" class="msg"></div>
+      <div id="gl"></div>
+    </form>
   </section>
 
   <!-- ============ COMPRAS ============ -->
@@ -836,8 +887,10 @@ function saveCfg(clave,valor){return rest("config_campamento",{method:"POST",pre
 /* ---------- navegación ---------- */
 var SEC="home";
 var VIEWS={
+  registro:{p:"p-registro",t:"Registro",g:"Venta de pollo agridulce"},
   pedidos:{p:"p-comida",t:"Pedidos",g:"Venta de pollo agridulce"},
   compras:{p:"p-compras",t:"Lista de compras",g:"Venta de pollo agridulce"},
+  gastos:{p:"p-gastos",t:"Gastos",g:"Venta de pollo agridulce"},
   inscritos:{p:"p-insc",t:"Inscritos",g:"Inscripción"},
   cobro:{p:"p-cobro",t:"Cobro y cierre",g:"Inscripción"},
   enlace:{p:"p-enlace",t:"Enlace del formulario",g:"Inscripción"},
@@ -847,7 +900,7 @@ var VIEWS={
   retos:{p:"p-retos",t:"Retos por equipo",g:"Inscripción"}
 };
 var INSC=["inscritos","cobro","enlace","claves","equipos","programa","retos"],NAVS=["home"].concat(INSC);
-var ALIAS={clave:"claves",contrasenas:"claves","contraseñas":"claves",pollo:"pedidos",insc:"inscritos",programacion:"programa",reto:"retos",inicio:"home","":"home"};
+var ALIAS={compras:"gastos",clave:"claves",contrasenas:"claves","contraseñas":"claves",pollo:"pedidos",insc:"inscritos",programacion:"programa",reto:"retos",inicio:"home","":"home"};
 function closeDrawer(){$("nav").classList.remove("drawer");$("nbk").classList.add("hidden")}
 function go(sec){
   sec=ALIAS.hasOwnProperty(sec)?ALIAS[sec]:sec;
@@ -857,14 +910,14 @@ function go(sec){
   $("app").classList.toggle("hidden",sec==="home");
   $("hact").classList.remove("hidden");
   Object.keys(VIEWS).forEach(function(k){$(VIEWS[k].p).classList.toggle("hidden",k!==sec)});
-  var enInsc=INSC.indexOf(sec)>-1,enPollo=sec==="pedidos"||sec==="compras";
+  var enInsc=INSC.indexOf(sec)>-1,enPollo=sec==="pedidos"||sec==="registro"||sec==="compras"||sec==="gastos";
   NAVS.forEach(function(k){$("n-"+k).classList.toggle("on",k===sec)});
   $("nav").classList.toggle("hidden",!enInsc);
   $("shell").classList.toggle("hasnav",enInsc);
   $("mbtn").classList.toggle("hidden",!enInsc);
   $("out").classList.toggle("hidden",!enPollo);
   $("tabs").classList.toggle("hidden",!enPollo);
-  $("t-pedidos").classList.toggle("on",sec==="pedidos");$("t-compras").classList.toggle("on",sec==="compras");
+  $("t-pedidos").classList.toggle("on",sec==="pedidos");$("t-compras").classList.toggle("on",sec==="compras");$("t-gastos").classList.toggle("on",sec==="gastos");$("t-registro").classList.toggle("on",sec==="registro");
   $("vtitle").classList.toggle("hidden",!enInsc);
   var f=new Date().toLocaleDateString("es-HN",{weekday:"long",day:"numeric",month:"long"});
   $("fecha").textContent=(sec==="home"?"Administración":VIEWS[sec].g)+" · "+f;
@@ -883,6 +936,8 @@ NAVS.forEach(function(k){$("n-"+k).addEventListener("click",function(){setHash(k
 $("out").addEventListener("click",function(){setHash("inicio")});
 $("t-pedidos").addEventListener("click",function(){setHash("pedidos")});
 $("t-compras").addEventListener("click",function(){setHash("compras")});
+$("t-gastos").addEventListener("click",function(){setHash("gastos")});
+$("t-registro").addEventListener("click",function(){setHash("registro")});
 window.addEventListener("hashchange",function(){go((location.hash||"").replace("#",""))});
 /* barra lateral: ensanchar / encoger (PC) y cajón (celular) */
 function setNav(open){$("nav").classList.toggle("open",open);$("shell").classList.toggle("navopen",open);lsSet("cmp_nav",open?"1":"0")}
@@ -913,8 +968,10 @@ function loadAll(){
     rest("retos?select=*&order=id.asc").then(function(x){S.rtErr=false;return x}).catch(function(){S.rtErr=true;return []}),
     rest("evidencias?select=*&order=created_at.desc").catch(function(){S.rtErr=true;return []}),
     rest("avisos?select=*&order=created_at.desc&limit=30").catch(function(){S.rtErr=true;return []}),
-    rest("rpc/claves_admin",{method:"POST",body:{}}).catch(function(){S.kErr=true;return {}})
+    rest("rpc/claves_admin",{method:"POST",body:{}}).catch(function(){S.kErr=true;return {}}),
+    rest("gastos_comida?select=*&order=created_at.desc").then(function(x){S.gErr=false;return x}).catch(function(e){if(e&&e.auth)throw e;S.gErr=true;return []})
   ]).then(function(r){
+    S.gastos=r[10]||[];
     S.prog=r[5]||[];S.retos=r[6]||[];S.evid=r[7]||[];S.avisos=r[8]||[];S.claveMap=(r[9]&&typeof r[9]==="object"&&!Array.isArray(r[9]))?r[9]:{};S.claves=Object.keys(S.claveMap);
     S.pagos=r[4]||[];
     S.pedidos=r[0]||[];S.compras=r[1]||[];S.insc=r[3]||[];
@@ -954,6 +1011,7 @@ $("cpg").addEventListener("input",calcTot);
 $("cp").addEventListener("input",calcTot);
 $("mn").addEventListener("click",function(){$("cp").value=Math.max(1,(parseInt($("cp").value,10)||1)-1);calcTot()});
 $("ms").addEventListener("click",function(){$("cp").value=(parseInt($("cp").value,10)||0)+1;calcTot()});
+$("ctr").addEventListener("change",function(){if(this.checked){$("cpg").value=Math.max(1,parseInt($("cp").value,10)||1)*S.precio;calcTot()}});
 $("cpt").addEventListener("click",function(){$("cpg").value=Math.max(1,parseInt($("cp").value,10)||1)*S.precio;calcTot()});
 
 $("prs").addEventListener("click",function(){
@@ -973,13 +1031,15 @@ $("fc").addEventListener("submit",function(ev){
   ev.preventDefault();
   var nombre=$("cn").value.trim();if(!nombre)return;
   var platos=Math.max(1,parseInt($("cp").value,10)||1),total=platos*S.precio;
+  var trf=$("ctr").checked;if(trf)$("cpg").value=total;
   var recibido=Math.max(0,num($("cpg").value)),pago=Math.min(total,recibido),cambio=Math.round(Math.max(0,recibido-total)*100)/100,debo=cambio>0&&$("cchk").checked;
   var b=$("cbtn");b.disabled=true;
   var row={nombre:nombre,platos:platos,precio_unitario:S.precio,monto:total,pagado:pago,cambio_pendiente:debo?cambio:0};
+  if(trf)row.transferencia=true;
   rest("pedidos_comida",{method:"POST",prefer:"return=representation",body:row}).then(function(r){
     S.pedidos.unshift(r[0]);
-    $("cn").value="";$("cpg").value="";$("cchk").checked=false;$("cp").value=1;calcTot();render();
-    toast("Pedido registrado: "+nombre+" · "+pl(platos)+(pago>=total?" · pagado":pago>0?" · abonó "+L(pago):"")+(cambio>0?(debo?" · debes "+L(cambio)+" de cambio (anotado)":" · devuelve "+L(cambio)+" de cambio"):""));$("cn").focus();
+    $("cn").value="";$("cpg").value="";$("cchk").checked=false;$("ctr").checked=false;$("cp").value=1;calcTot();render();
+    toast("Pedido registrado: "+nombre+" · "+pl(platos)+(pago>=total?(trf?" · pagado por transferencia":" · pagado"):pago>0?" · abonó "+L(pago):"")+(cambio>0?(debo?" · debes "+L(cambio)+" de cambio (anotado)":" · devuelve "+L(cambio)+" de cambio"):""));$("cn").focus();
   }).catch(fail).then(function(){b.disabled=false});
 });
 
@@ -1012,10 +1072,11 @@ function renderStats(){
     if(s>0){nDeuda++;if(p.entregado)deudaEnt+=s}
   });
   $("stC").innerHTML=
-    '<div class="cell"><div class="t">Pedidos registrados</div><b>'+n+'</b><small>'+(nDeuda?nDeuda+' con saldo pendiente':'todos al día')+'</small></div>'+
-    '<div class="cell"><div class="t">Platos</div><b>'+pls+'</b><small>'+plPend+' por entregar</small></div>'+
-    '<div class="cell"><div class="t">Ingresos totales</div><b>'+L(tot)+'</b><small>cobrado '+L(cob)+'</small></div>'+
-    '<div class="cell key"><div class="t">Pendiente de cobro</div><b>'+L(tot-cob)+'</b><small>'+(deudaEnt?L(deudaEnt)+' de platos ya entregados':(nDeuda?nDeuda+' pedido'+(nDeuda===1?'':'s'):'al día'))+'</small></div>';
+    '<div class="cell"><div class="t">Pedidos registrados</div><b>'+n+'</b></div>'+
+    '<div class="cell"><div class="t">Platos</div><b>'+pls+'</b></div>'+
+    '<div class="cell"><div class="t">Ingresos totales</div><b>'+L(tot)+'</b></div>'+
+    '<div class="cell got"><div class="t">Cobrado hasta ahora</div><b>'+L(cob)+'</b></div>'+
+    '<div class="cell key"><div class="t">Pendiente de cobro</div><b>'+L(tot-cob)+'</b></div>'+defCell(cob);
   return {n:n,pls:pls,tot:tot,cob:cob,plPend:plPend,nDeuda:nDeuda,deudaEnt:deudaEnt};
 }
 
@@ -1064,6 +1125,7 @@ function renderResumen(t){
   $("rs").innerHTML=html;
 }
 
+function trfHtml(p){return p.transferencia?' <span class="trfb">💳 Transferencia</span>':''}
 function tagHtml(p){
   var s=saldo(p),pg=num(p.pagado),ent=!!p.entregado;
   if(ent&&s<=0)return '<div class="tag">✔ Cancelado'+(p.entregado_at?' · retiró '+esc(hora(p.entregado_at)):'')+'</div>';
@@ -1089,24 +1151,27 @@ function actsHtml(p){
 
 function renderComida(){
   var P=S.pedidos,n=P.length,t=renderStats();
+  renderGastos();
   renderResumen(t);
   var q=S.q.toLowerCase();
   var list=P.filter(function(p){
     var s=saldo(p),done=p.entregado&&s<=0;
     if(S.filtro==="pend"&&p.entregado)return false;
     if(S.filtro==="deben"&&!(p.entregado&&s>0))return false;
+    if(S.filtro==="abono"&&!(num(p.pagado)>0&&s>0))return false;
+    if(S.filtro==="pago"&&!(s<=0&&num(p.monto)>0))return false;
     if(S.filtro==="canc"&&!done)return false;
     if(S.filtro==="cambio"&&!(num(p.cambio_pendiente)>0))return false;
     return !q||(p.nombre||"").toLowerCase().indexOf(q)>-1;
   });
   list.sort(function(a,b){return rank(a)-rank(b)});
   $("npd").textContent=n?list.length+" de "+n:"";
-  var nc=P.filter(function(p){return num(p.cambio_pendiente)>0}).length;$("ncamb").textContent=nc?nc:"";
+  var nc=P.filter(function(p){return num(p.cambio_pendiente)>0}).length;$("ncamb").textContent=nc?nc:"";var np=P.filter(function(p){return saldo(p)<=0&&num(p.monto)>0}).length;$("npago").textContent=np?np:"";var na=P.filter(function(p){return num(p.pagado)>0&&saldo(p)>0}).length;$("nabo").textContent=na?na:"";
   $("lc").innerHTML=list.length?list.map(function(p){
     var s=saldo(p),cls=p.entregado&&s<=0?" done":(p.entregado?" debt":"");
     return '<div class="item row'+cls+'">'+
-      '<div class="c-n"><div class="n">'+esc(p.nombre)+'</div>'+tagHtml(p)+cambioHtml(p)+'</div>'+
-      '<div class="c-r"><span class="pl">'+pl(p.platos)+'</span><div class="c-m"><b>'+L(p.monto)+'</b><span class="c-t">'+esc(fechaHora(p.created_at))+'</span></div></div>'+
+      '<div class="c-n"><div class="n">'+esc(p.nombre)+'</div>'+tagHtml(p)+trfHtml(p)+cambioHtml(p)+'</div>'+
+      '<div class="c-r"><span class="pl">'+pl(p.platos)+'</span><span class="pf'+(saldo(p)<=0?' ok':'')+'">'+(saldo(p)<=0?'✔ platos pagados':(function(){var u=p.platos?num(p.monto)/p.platos:0,x=u?Math.round(saldo(p)/u*10)/10:0;return 'faltan '+x+(x===1?' plato':' platos')+' por pagar'})())+'</span><div class="c-m"><b>'+L(p.monto)+'</b><span class="c-t">'+esc(fechaHora(p.created_at))+'</span></div></div>'+
       '<div class="acts">'+actsHtml(p)+'</div></div>';
   }).join(""):'<div class="empty">'+(n?"Ningún pedido coincide con lo que buscas.":"Todavía no hay pedidos. Cuando alguien encargue, aparecerá aquí.")+'</div>';
 }
@@ -1202,6 +1267,7 @@ function editPedido(id){
     '<div><label class="l">Precio por plato (L)</label><input id="eu" type="number" min="0" step="any" inputmode="decimal" value="'+num(p.precio_unitario)+'"></div></div>'+
     '<div><label class="l">Dinero recibido (L)</label><input id="eg" type="number" min="0" step="any" inputmode="decimal" value="'+(Math.round((num(p.pagado)+num(p.cambio_pendiente))*100)/100)+'"></div>'+
     '<label class="chk vuelto hidden" id="evw"><input type="checkbox" id="evc"'+(num(p.cambio_pendiente)>0?" checked":"")+'> <span id="evt"></span></label>'+
+    '<label class="chk trf"><input type="checkbox" id="etr"'+(p.transferencia?" checked":"")+'> Pagó por transferencia</label>'+
     '<label class="chk"><input type="checkbox" id="ee"'+(p.entregado?" checked":"")+'> Ya se entregaron los platos</label>'+
     '<div class="tot"><span>Total · <small id="es"></small></span><span id="et"></span></div>'+
     '<div class="msg" id="em2"></div>'+
@@ -1212,13 +1278,16 @@ function editPedido(id){
     $("evw").classList.toggle("hidden",!(vu>0.001));
     if(vu>0.001)$("evt").innerHTML="Le debo el vuelto: <b>"+esc(L(vu))+"</b>";else $("evc").checked=false;
   };
+  $("etr").onchange=function(){if(this.checked){$("eg").value=(parseInt($("ep").value,10)||0)*num($("eu").value);upd()}};
   upd();$("ep").oninput=upd;$("eu").oninput=upd;$("eg").oninput=upd;
   $("ecl").onclick=closeModal;
   $("esv").onclick=function(){
     var nombre=$("en").value.trim(),platos=parseInt($("ep").value,10)||0,pu=num($("eu").value),rec=Math.max(0,num($("eg").value));
     if(!nombre||platos<1){$("em2").textContent="Pon un nombre y al menos 1 plato.";return}
+    var trf=$("etr").checked;if(trf)rec=Math.max(rec,platos*pu);
     var ent=$("ee").checked,tot=platos*pu,pg=Math.min(rec,tot),vu=Math.round(Math.max(0,rec-tot)*100)/100;
     var body={nombre:nombre,platos:platos,precio_unitario:pu,monto:tot,pagado:pg,cambio_pendiente:($("evc").checked&&vu>0)?vu:0,entregado:ent,entregado_at:ent?(p.entregado_at||nowIso()):null};
+    if(trf||p.transferencia)body.transferencia=trf;
     closeModal();patchPedido(id,body,"Pedido actualizado",false);
   };
   $("edel").onclick=function(){
@@ -1259,14 +1328,52 @@ function toggleCompra(id,val){
     S.compras[S.compras.indexOf(c)]=r[0]||Object.assign(c,body);renderCompras();
   }).catch(function(e){renderCompras();fail(e)});
 }
+function defCell(cob){
+  var gt=0;(S.gastos||[]).forEach(function(g){gt+=num(g.monto)});var d=cob-gt;
+  return '<div class="cell fin" id="cdef"><div class="t">Total definitivo</div><b'+(d<0?' class="neg"':'')+'>'+(d<0?'− ':'')+L(Math.abs(d))+'</b></div>';
+}
+function renderGastos(){
+  var el=$("stG");if(!el)return;
+  var cob=0;S.pedidos.forEach(function(p){cob+=num(p.monto)-saldo(p)});
+  var G=S.gastos||[],gt=0;G.forEach(function(g){gt+=num(g.monto)});
+  var def=cob-gt;
+  el.innerHTML=
+    '<div class="cell got"><div class="t">Cobrado hasta ahora</div><b>'+L(cob)+'</b></div>'+
+    '<div class="cell"><div class="t">Gastos</div><b>'+L(gt)+'</b></div>'+
+    '<div class="cell fin"><div class="t">Total definitivo</div><b'+(def<0?' class="neg"':'')+'>'+(def<0?'− ':'')+L(Math.abs(def))+'</b></div>';
+  var cd=$("cdef");if(cd)cd.outerHTML=defCell(cob);
+  $("gcnt").textContent=G.length?"· "+L(gt):"";
+  $("gerr").textContent=S.gErr?"Falta crear la tabla de gastos: ejecuta de nuevo el archivo campamento-comida.sql en Supabase.":"";
+  $("gl").innerHTML=G.length?G.map(function(g){return '<div class="gi"><div class="gt"><b>'+esc(g.concepto)+'</b><span>'+esc(fechaHora(g.created_at))+'</span></div><span class="gv">'+L(g.monto)+'</span><button type="button" data-a="gedit" data-id="'+g.id+'" aria-label="Editar">✏️</button><button type="button" data-a="gdel" data-id="'+g.id+'" aria-label="Borrar">✕</button></div>'}).join(""):'<div class="empty" style="margin-top:4px">Aún no has anotado gastos. Cada vez que gastes, anótalo aquí y se resta de lo cobrado.</div>';
+}
+$("fg").addEventListener("submit",function(ev){
+  ev.preventDefault();
+  var c=$("gc").value.trim(),m=num($("gm").value);if(!c||!(m>0))return;
+  rest("gastos_comida",{method:"POST",prefer:"return=representation",body:{concepto:c,monto:m}}).then(function(r){
+    S.gastos=S.gastos||[];S.gastos.unshift(r[0]);S.gErr=false;$("gc").value="";$("gm").value="";renderGastos();$("gc").focus();toast("Gasto anotado: "+c+" · "+L(m));
+  }).catch(function(e){S.gErr=true;renderGastos();fail(e)});
+});
+$("gl").addEventListener("click",function(ev){
+  var b=ev.target.closest("[data-a]");if(!b)return;
+  var id=b.getAttribute("data-id"),g=(S.gastos||[]).filter(function(x){return String(x.id)===id})[0];if(!g)return;
+  if(b.getAttribute("data-a")==="gdel"){
+    if(!confirm("¿Borrar el gasto «"+g.concepto+"» de "+L(g.monto)+"?"))return;
+    rest("gastos_comida?id=eq."+encodeURIComponent(id),{method:"DELETE"}).then(function(){S.gastos=S.gastos.filter(function(x){return x!==g});renderGastos();toast("Gasto borrado")}).catch(fail);
+  }else{
+    var c=prompt("¿En qué fue el gasto?",g.concepto);if(c===null||!c.trim())return;
+    var m=prompt("Monto (L)",g.monto);if(m===null)return;m=num(m);if(!(m>0))return;
+    rest("gastos_comida?id=eq."+encodeURIComponent(id),{method:"PATCH",prefer:"return=representation",body:{concepto:c.trim(),monto:m}}).then(function(r){S.gastos[S.gastos.indexOf(g)]=r[0]||Object.assign(g,{concepto:c.trim(),monto:m});renderGastos();toast("Gasto actualizado")}).catch(fail);
+  }
+});
 function renderCompras(){
+  renderGastos();
   var C=S.compras,est=0,hecho=0,nP=0,nB=0;
   C.forEach(function(c){var v=num(c.costo);est+=v;if(c.comprado){hecho+=v;nB++}else nP++});
   $("stP").innerHTML=
-    '<div class="cell"><div class="t">Por comprar</div><b>'+nP+'</b><small>'+(nP?'artículo'+(nP===1?'':'s')+' pendiente'+(nP===1?'':'s'):'nada pendiente')+'</small></div>'+
-    '<div class="cell"><div class="t">Ya comprado</div><b>'+nB+'</b><small>de '+C.length+' en la lista</small></div>'+
-    '<div class="cell"><div class="t">Gastado (aprox.)</div><b>'+L(hecho)+'</b><small>de lo ya comprado</small></div>'+
-    '<div class="cell key"><div class="t">Falta por gastar</div><b>'+L(est-hecho)+'</b><small>total aprox. '+L(est)+'</small></div>';
+    '<div class="cell"><div class="t">Por comprar</div><b>'+nP+'</b></div>'+
+    '<div class="cell"><div class="t">Ya comprado</div><b>'+nB+'</b></div>'+
+    '<div class="cell"><div class="t">Gastado (aprox.)</div><b>'+L(hecho)+'</b></div>'+
+    '<div class="cell key"><div class="t">Falta por gastar</div><b>'+L(est-hecho)+'</b></div>';
   var card=function(c){
     var sub=[c.cantidad,c.costo!=null?L(c.costo):""].filter(Boolean).map(esc).join(" · ");
     return '<div class="item'+(c.comprado?" bought done":"")+'"><div class="ck">'+
@@ -1728,22 +1835,22 @@ function renderInsc(){
   });
   var ts=TALLAS.filter(function(k){return tl[k]}).map(function(k){return k+" "+tl[k]}).join(" · ");
   $("stI").innerHTML=
-    '<div class="cell"><div class="t">Inscritos</div><b>'+n+'</b><small>'+(hoy?hoy+' hoy':'ninguno hoy')+'</small></div>'+
-    '<div class="cell"><div class="t">Con camisa</div><b>'+cam+'</b><small>'+(ts||'sin tallas aún')+'</small></div>'+
-    '<div class="cell"><div class="t">Con alergia</div><b>'+al+'</b><small>avisar a cocina</small></div>'+
-    '<div class="cell"><div class="t">Toman medicamento</div><b>'+me+'</b><small>tenerlo presente</small></div>'+
-    '<div class="cell"><div class="t">Trabajan el viernes</div><b>'+vi+'</b><small>llegan más tarde</small></div>';
+    '<div class="cell"><div class="t">Inscritos</div><b>'+n+'</b></div>'+
+    '<div class="cell"><div class="t">Con camisa</div><b>'+cam+'</b></div>'+
+    '<div class="cell"><div class="t">Con alergia</div><b>'+al+'</b></div>'+
+    '<div class="cell"><div class="t">Toman medicamento</div><b>'+me+'</b></div>'+
+    '<div class="cell"><div class="t">Trabajan el viernes</div><b>'+vi+'</b></div>';
   var pm={};S.pagos.forEach(function(p){pm[p.inscripcion_id]=(pm[p.inscripcion_id]||0)+num(p.monto)});
   var cobrado=0,sinpago=0,completos=0;
   D.forEach(function(r){var pg=pm[r.id]||0;cobrado+=pg;if(pg<=0)sinpago++;if(pg>=S.pTotal)completos++});
   var esperado=D.length*S.pTotal,falta=Math.max(0,esperado-cobrado);
   var porConf=0,nConf=0;D.forEach(function(r){if(pendiente(r)){porConf+=num(r.abono_inicial);nConf++}});
   $("stM").innerHTML=
-    '<div class="cell"><div class="t">Cobrado</div><b>'+L(cobrado)+'</b><small>de '+L(esperado)+' esperados</small></div>'+
-    '<div class="cell"><div class="t">Falta por cobrar</div><b class="debt">'+L(falta)+'</b><small>'+(D.length-completos)+' con saldo</small></div>'+
-    '<div class="cell"><div class="t">Pagaron todo</div><b>'+completos+'</b><small>de '+n+'</small></div>'+
-    '<div class="cell"><div class="t">Sin ningún pago</div><b>'+sinpago+'</b><small>por recordarles</small></div>'+
-    '<div class="cell"><div class="t">Por confirmar</div><b>'+L(porConf)+'</b><small>'+(nConf?nConf+' dijeron cuánto pagan':'nada pendiente')+'</small></div>';
+    '<div class="cell"><div class="t">Cobrado</div><b>'+L(cobrado)+'</b></div>'+
+    '<div class="cell"><div class="t">Falta por cobrar</div><b class="debt">'+L(falta)+'</b></div>'+
+    '<div class="cell"><div class="t">Pagaron todo</div><b>'+completos+'</b></div>'+
+    '<div class="cell"><div class="t">Sin ningún pago</div><b>'+sinpago+'</b></div>'+
+    '<div class="cell"><div class="t">Por confirmar</div><b>'+L(porConf)+'</b></div>';
   $("cest").className="cierre "+(inscAbiertas()?"ab":"ce");
   $("cest").textContent=!S.abiertas?"Inscripciones cerradas":(S.cierre&&hoyISO()>S.cierre?"Inscripciones cerradas (pasó la fecha)":"Inscripciones abiertas"+(S.cierre?" hasta el "+fechaLarga(S.cierre):""));
   $("pcl").textContent=S.abiertas?"Cerrar inscripciones ahora":"Reabrir inscripciones";
