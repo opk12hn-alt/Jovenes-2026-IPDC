@@ -410,6 +410,8 @@ label.l{font-weight:600;font-size:13px;display:block;margin-bottom:4px;color:var
 .n{font-weight:700;font-size:16px;word-break:break-word}
 .s{color:var(--muted);font-size:13px;word-break:break-word}
 .prepb{display:inline-block;margin-top:3px;font-size:12px;font-weight:800;color:#1B7F44;background:#E3F5EA;border-radius:6px;padding:2px 8px}
+.pe{display:block;font-size:12px;font-weight:800;white-space:nowrap;color:var(--muted);margin-top:2px}.pe.on{color:#0A6C8F}
+.mdsub{margin:0 0 8px;color:var(--muted);font-size:14px}
 .prepck{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:700;font-size:15px;cursor:pointer;user-select:none}
 .prepck input{width:22px;height:22px;margin:0;accent-color:#1B7F44;cursor:pointer}
 .prepck.on{border-color:#1B7F44;background:#E3F5EA;color:#1B7F44}
@@ -873,12 +875,15 @@ function rest(path,o){
 }
 function fail(e){
   var m=(e&&e.message)||"";
-  var txt=/relation .* does not exist|PGRST205|42P01/i.test(m)
+  var txt=/PGRST204|column .* does not exist|42703|schema cache/i.test(m)
+    ?"No se guardó: falta actualizar Supabase. Ejecuta de nuevo el archivo campamento-comida.sql en el SQL Editor y recarga."
+    :/relation .* does not exist|PGRST205|42P01/i.test(m)
     ?"Faltan las tablas en Supabase. Ejecuta el archivo campamento-comida.sql en el SQL Editor."
     :/permission denied|42501|row-level security|401|403/i.test(m)||(e&&(e.status===401||e.status===403))
     ?"Supabase no deja entrar sin sesión todavía. Ejecuta de nuevo el archivo campamento-comida.sql en el SQL Editor."
     :"No se pudo guardar o cargar. Revisa tu conexión e intenta de nuevo.";
   $("gmsg").textContent=txt;$("hmsg").textContent=txt;
+  try{toast(txt)}catch(_){}
 }
 function saveCfg(clave,valor){return rest("config_campamento",{method:"POST",prefer:"resolution=merge-duplicates,return=minimal",body:{clave:clave,valor:String(valor)}})}
 
@@ -1033,6 +1038,7 @@ $("mts").addEventListener("click",function(){
 
 /* saldo = lo que todavía debe */
 function saldo(p){return Math.max(0,Math.round((num(p.monto)-num(p.pagado))*100)/100)}
+function pe(p){return p.entregado?num(p.platos):Math.min(num(p.platos_entregados),num(p.platos))}
 function rank(p){var s=saldo(p)>0;if(p.entregado&&!s)return 2;if(p.entregado&&s)return 0;return 1}
 
 $("fc").addEventListener("submit",function(ev){
@@ -1060,15 +1066,35 @@ function patchPedido(id,body,msg,withUndo){
     if(msg)toast(msg,withUndo?"Deshacer":null,withUndo?function(){patchPedido(id,prev,"Cambio deshecho")}:null);
   }).catch(fail);
 }
+function entregarModal(p){
+  var ya=pe(p),falta=num(p.platos)-ya;
+  openModal('<h3>Entregar platos</h3><p class="mdsub">'+esc(p.nombre)+' · pidió '+pl(p.platos)+(ya?' · ya se le entregaron '+ya:'')+'</p>'+
+    '<div><label class="l" for="en2">¿Cuántos platos entregas ahora?</label><div class="pay"><input id="en2" type="number" min="1" max="'+falta+'" inputmode="numeric" value="'+falta+'"><button type="button" id="en2t">Todos ('+falta+')</button></div></div>'+
+    '<div class="msg" id="en2m"></div>'+
+    '<div class="btns"><button id="en2c">Cerrar</button><button class="save" id="en2s">Entregar</button></div>');
+  $("en2t").onclick=function(){$("en2").value=falta};
+  $("en2c").onclick=closeModal;
+  $("en2s").onclick=function(){
+    var n=parseInt($("en2").value,10)||0;
+    if(n<1||n>falta){$("en2m").textContent="Escribe un número entre 1 y "+falta+".";return}
+    var tot=ya+n,body={platos_entregados:tot},s=saldo(p),resto=num(p.platos)-tot;
+    if(resto<=0){body.entregado=true;body.entregado_at=nowIso()}
+    closeModal();
+    patchPedido(p.id,body,n+" plato"+(n===1?"":"s")+" entregado"+(n===1?"":"s")+" a "+p.nombre+(resto>0?" · faltan "+resto:" · ya se entregó todo"+(s?" · debe "+L(s):"")),false);
+  };
+}
 function nowIso(){return new Date().toISOString()}
 function accion(id,a){
   var p=fp(id);if(!p)return;var s=saldo(p);
   if(a==="go")pagar(id,{ent:true});
   else if(a==="prep")patchPedido(id,{preparado:!p.preparado},p.preparado?"Ya no está preparado: "+p.nombre:"Preparado para entregar: "+p.nombre,false);
-  else if(a==="ent")patchPedido(id,{entregado:true,entregado_at:nowIso()},p.nombre+" se llevó los platos"+(s?" · debe "+L(s):""),true);
+  else if(a==="ent"){
+    if(num(p.platos)<=1)patchPedido(id,{entregado:true,platos_entregados:num(p.platos),entregado_at:nowIso()},p.nombre+" se llevó los platos"+(s?" · debe "+L(s):""),true);
+    else entregarModal(p);
+  }
   else if(a==="cobrar")pagar(id,{});
   else if(a==="abonar")pagar(id,{vacio:true});
-  else if(a==="undo"){if(confirm("¿Deshacer? El pedido de "+p.nombre+" volverá a «por entregar» y sin pagos."))patchPedido(id,{entregado:false,entregado_at:null,pagado:0,cambio_pendiente:0},"Pedido reabierto")}
+  else if(a==="undo"){if(confirm("¿Deshacer? El pedido de "+p.nombre+" volverá a «por entregar» y sin pagos."))patchPedido(id,{entregado:false,platos_entregados:0,entregado_at:null,pagado:0,cambio_pendiente:0},"Pedido reabierto")}
   else if(a==="dev")devolver(id);
   else if(a==="edit")editPedido(id);
 }
@@ -1077,7 +1103,7 @@ function renderStats(){
   var P=S.pedidos,n=P.length,pls=0,tot=0,cob=0,plPend=0,nDeuda=0,deudaEnt=0;
   P.forEach(function(p){
     var s=saldo(p);pls+=p.platos;tot+=num(p.monto);cob+=num(p.monto)-s;
-    if(!p.entregado)plPend+=p.platos;
+    if(!p.entregado)plPend+=num(p.platos)-pe(p);
     if(s>0){nDeuda++;if(p.entregado)deudaEnt+=s}
   });
   $("stC").innerHTML=
@@ -1190,7 +1216,7 @@ function renderComida(){
     var s=saldo(p),cls=p.entregado&&s<=0?" done":(p.entregado?" debt":"");
     return '<div class="item row'+cls+'">'+
       '<div class="c-n"><div class="n">'+esc(p.nombre)+'</div>'+tagHtml(p)+trfHtml(p)+prepHtml(p)+cambioHtml(p)+'</div>'+
-      '<div class="c-r"><span class="pl">'+pl(p.platos)+'</span><span class="pf'+(saldo(p)<=0?' ok':'')+'">'+(saldo(p)<=0?'✔ platos pagados':(function(){var u=p.platos?num(p.monto)/p.platos:0,x=u?Math.round(saldo(p)/u*10)/10:0;return 'faltan '+x+(x===1?' plato':' platos')+' por pagar'})())+'</span><div class="c-m"><b>'+L(p.monto)+'</b><span class="c-t">'+esc(fechaHora(p.created_at))+'</span></div></div>'+
+      '<div class="c-r"><span class="pl">'+pl(p.platos)+'</span><span class="pf'+(saldo(p)<=0?' ok':'')+'">'+(saldo(p)<=0?'✔ platos pagados':(function(){var u=p.platos?num(p.monto)/p.platos:0,x=u?Math.round(saldo(p)/u*10)/10:0;return 'faltan '+x+(x===1?' plato':' platos')+' por pagar'})())+'</span>'+(!p.entregado?'<span class="pe'+(pe(p)>0?' on':'')+'">Entregados '+pe(p)+' · faltan '+(num(p.platos)-pe(p))+'</span>':'')+'<div class="c-m"><b>'+L(p.monto)+'</b><span class="c-t">'+esc(fechaHora(p.created_at))+'</span></div></div>'+
       '<div class="acts">'+actsHtml(p)+'</div></div>';
   }).join(""):'<div class="empty">'+(n?"Ningún pedido coincide con lo que buscas.":"Todavía no hay pedidos. Cuando alguien encargue, aparecerá aquí.")+'</div>';
 }
@@ -1247,7 +1273,7 @@ function pagar(id,o){
     if(v<=0){$("abm").textContent="Escribe cuánto recibiste.";return}
     var pay=Math.min(v,s),cambio=Math.round(Math.max(0,v-s)*100)/100,resta=Math.max(0,Math.round((s-pay)*100)/100);
     var body={pagado:Math.round((num(p.pagado)+pay)*100)/100};
-    if($("abe")&&$("abe").checked){body.entregado=true;body.entregado_at=nowIso()}
+    if($("abe")&&$("abe").checked){body.entregado=true;body.platos_entregados=num(p.platos);body.entregado_at=nowIso()}
     var ent=p.entregado||body.entregado;
     var pend=cambio>0&&$("abv").checked;
     if(pend)body.cambio_pendiente=Math.round((num(p.cambio_pendiente)+cambio)*100)/100;
@@ -1307,6 +1333,7 @@ function editPedido(id){
     var trf=$("etr").checked;if(trf)rec=Math.max(rec,platos*pu);
     var ent=$("ee").checked,tot=platos*pu,pg=Math.min(rec,tot),vu=Math.round(Math.max(0,rec-tot)*100)/100;
     var body={nombre:nombre,platos:platos,precio_unitario:pu,monto:tot,pagado:pg,cambio_pendiente:($("evc").checked&&vu>0)?vu:0,entregado:ent,entregado_at:ent?(p.entregado_at||nowIso()):null};
+    if(ent||p.entregado||num(p.platos_entregados)>0)body.platos_entregados=ent?platos:Math.min(p.entregado?0:num(p.platos_entregados),platos);
     if(trf||p.transferencia)body.transferencia=trf;
     closeModal();patchPedido(id,body,"Pedido actualizado",false);
   };
