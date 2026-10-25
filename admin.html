@@ -185,6 +185,8 @@ label.l{font-weight:600;font-size:13px;display:block;margin-bottom:4px;color:var
 
 /* lista de pedidos */
 .bar{display:flex;gap:8px;margin-bottom:10px}
+#pbar select{width:auto;flex:0 0 auto;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit;font-size:15px;color:var(--ink)}
+@media (max-width:640px){#pbar{flex-wrap:wrap}#pbar input{flex:1 1 100%}#pbar select{flex:1 1 0;min-width:0}#pbar button{flex:0 0 auto}}
 #pdw label.l{margin-top:0}#pdw select{display:block;width:100%;min-height:46px;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
 .dtr{display:grid;grid-template-columns:1fr 34px;gap:6px;align-items:start;background:#F4F6FA;border:1px solid var(--line);border-radius:10px;padding:8px}
 .dtr .dtf{display:grid;gap:6px;min-width:0}
@@ -407,6 +409,11 @@ label.l{font-weight:600;font-size:13px;display:block;margin-bottom:4px;color:var
 .c-r .c-t{display:block;font-size:12px;color:var(--muted)}
 .n{font-weight:700;font-size:16px;word-break:break-word}
 .s{color:var(--muted);font-size:13px;word-break:break-word}
+.prepb{display:inline-block;margin-top:3px;font-size:12px;font-weight:800;color:#1B7F44;background:#E3F5EA;border-radius:6px;padding:2px 8px}
+.prepck{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:700;font-size:15px;cursor:pointer;user-select:none}
+.prepck input{width:22px;height:22px;margin:0;accent-color:#1B7F44;cursor:pointer}
+.prepck.on{border-color:#1B7F44;background:#E3F5EA;color:#1B7F44}
+.prepok{border-color:#1B7F44!important;color:#1B7F44!important;background:#E3F5EA!important}
 .trfb{display:inline-block;margin-top:3px;font-size:12px;font-weight:800;color:#0A6C8F;background:#DDF1FA;border-radius:6px;padding:2px 8px}
 .chk.trf{margin-top:8px}
 .pf{display:block;white-space:nowrap;font-size:12px;font-weight:700;color:#9A6A00;margin-top:2px}.pf.ok{color:#1B7F44}
@@ -650,10 +657,11 @@ a.wabtn{flex:1;display:flex;align-items:center;justify-content:center;border-rad
   <section id="p-comida">
     <div class="strip" id="stC"></div>
     <div class="sh2">Pedidos <small id="npd"></small></div>
-    <div class="bar"><input id="q" type="search" placeholder="Buscar por nombre"><button id="csv">Descargar Excel</button></div>
+    <div class="bar" id="pbar"><input id="q" type="search" placeholder="Buscar por nombre"><select id="ord" aria-label="Ordenar pedidos"><option value="def">Orden normal</option><option value="mas">Más platos primero</option><option value="menos">Menos platos primero</option><option value="az">Nombre A-Z</option><option value="deuda">Más deben primero</option></select><button id="csv">Descargar Excel</button></div>
     <div class="seg" id="seg">
       <button data-f="todos" class="on">Todos</button>
       <button data-f="pend">Por entregar</button>
+      <button data-f="listo">Preparados<span class="cnt" id="nprep"></span></button>
       <button data-f="deben">Deben</button>
       <button data-f="pago">Ya pagaron<span class="cnt" id="npago"></span></button>
       <button data-f="abono">Abonaron<span class="cnt" id="nabo"></span></button>
@@ -1056,6 +1064,7 @@ function nowIso(){return new Date().toISOString()}
 function accion(id,a){
   var p=fp(id);if(!p)return;var s=saldo(p);
   if(a==="go")pagar(id,{ent:true});
+  else if(a==="prep")patchPedido(id,{preparado:!p.preparado},p.preparado?"Ya no está preparado: "+p.nombre:"Preparado para entregar: "+p.nombre,false);
   else if(a==="ent")patchPedido(id,{entregado:true,entregado_at:nowIso()},p.nombre+" se llevó los platos"+(s?" · debe "+L(s):""),true);
   else if(a==="cobrar")pagar(id,{});
   else if(a==="abonar")pagar(id,{vacio:true});
@@ -1125,6 +1134,7 @@ function renderResumen(t){
   $("rs").innerHTML=html;
 }
 
+function prepHtml(p){return p.preparado&&!p.entregado?' <span class="prepb">🍽 Preparado</span>':''}
 function trfHtml(p){return p.transferencia?' <span class="trfb">💳 Transferencia</span>':''}
 function tagHtml(p){
   var s=saldo(p),pg=num(p.pagado),ent=!!p.entregado;
@@ -1146,6 +1156,7 @@ function actsHtml(p){
   else if(ent)h=btn("go","cobrar",p.id,"Cobrar "+esc(L(s)))+btn("alt","abonar",p.id,"Abonar");
   else if(s<=0)h=btn("go solo","ent",p.id,"Entregar");
   else h=btn("go","go",p.id,"Retiró y pagó")+btn("alt","ent",p.id,"Entregar")+btn("alt","abonar",p.id,"Abonar");
+  if(!ent)h+='<label class="prepck'+(p.preparado?' on':'')+'"><input type="checkbox" data-a="prep" data-id="'+p.id+'"'+(p.preparado?' checked':'')+'><span>Preparado</span></label>';
   return h+'<button class="more" data-a="edit" data-id="'+p.id+'" aria-label="Editar">⋯</button>';
 }
 
@@ -1157,6 +1168,7 @@ function renderComida(){
   var list=P.filter(function(p){
     var s=saldo(p),done=p.entregado&&s<=0;
     if(S.filtro==="pend"&&p.entregado)return false;
+    if(S.filtro==="listo"&&!(p.preparado&&!p.entregado))return false;
     if(S.filtro==="deben"&&!(p.entregado&&s>0))return false;
     if(S.filtro==="abono"&&!(num(p.pagado)>0&&s>0))return false;
     if(S.filtro==="pago"&&!(s<=0&&num(p.monto)>0))return false;
@@ -1164,22 +1176,30 @@ function renderComida(){
     if(S.filtro==="cambio"&&!(num(p.cambio_pendiente)>0))return false;
     return !q||(p.nombre||"").toLowerCase().indexOf(q)>-1;
   });
-  list.sort(function(a,b){return rank(a)-rank(b)});
+  var o=S.ord||"def";
+  list.sort(function(a,b){
+    if(o==="mas")return num(b.platos)-num(a.platos)||rank(a)-rank(b);
+    if(o==="menos")return num(a.platos)-num(b.platos)||rank(a)-rank(b);
+    if(o==="az")return String(a.nombre||"").localeCompare(String(b.nombre||""),"es",{sensitivity:"base"});
+    if(o==="deuda")return saldo(b)-saldo(a)||rank(a)-rank(b);
+    return rank(a)-rank(b);
+  });
   $("npd").textContent=n?list.length+" de "+n:"";
-  var nc=P.filter(function(p){return num(p.cambio_pendiente)>0}).length;$("ncamb").textContent=nc?nc:"";var np=P.filter(function(p){return saldo(p)<=0&&num(p.monto)>0}).length;$("npago").textContent=np?np:"";var na=P.filter(function(p){return num(p.pagado)>0&&saldo(p)>0}).length;$("nabo").textContent=na?na:"";
+  var nc=P.filter(function(p){return num(p.cambio_pendiente)>0}).length;$("ncamb").textContent=nc?nc:"";var npr=P.filter(function(p){return p.preparado&&!p.entregado}).length;$("nprep").textContent=npr?npr:"";var np=P.filter(function(p){return saldo(p)<=0&&num(p.monto)>0}).length;$("npago").textContent=np?np:"";var na=P.filter(function(p){return num(p.pagado)>0&&saldo(p)>0}).length;$("nabo").textContent=na?na:"";
   $("lc").innerHTML=list.length?list.map(function(p){
     var s=saldo(p),cls=p.entregado&&s<=0?" done":(p.entregado?" debt":"");
     return '<div class="item row'+cls+'">'+
-      '<div class="c-n"><div class="n">'+esc(p.nombre)+'</div>'+tagHtml(p)+trfHtml(p)+cambioHtml(p)+'</div>'+
+      '<div class="c-n"><div class="n">'+esc(p.nombre)+'</div>'+tagHtml(p)+trfHtml(p)+prepHtml(p)+cambioHtml(p)+'</div>'+
       '<div class="c-r"><span class="pl">'+pl(p.platos)+'</span><span class="pf'+(saldo(p)<=0?' ok':'')+'">'+(saldo(p)<=0?'✔ platos pagados':(function(){var u=p.platos?num(p.monto)/p.platos:0,x=u?Math.round(saldo(p)/u*10)/10:0;return 'faltan '+x+(x===1?' plato':' platos')+' por pagar'})())+'</span><div class="c-m"><b>'+L(p.monto)+'</b><span class="c-t">'+esc(fechaHora(p.created_at))+'</span></div></div>'+
       '<div class="acts">'+actsHtml(p)+'</div></div>';
   }).join(""):'<div class="empty">'+(n?"Ningún pedido coincide con lo que buscas.":"Todavía no hay pedidos. Cuando alguien encargue, aparecerá aquí.")+'</div>';
 }
 $("lc").addEventListener("click",function(ev){
-  var b=ev.target.closest("button[data-a]");if(!b)return;
+  var b=ev.target.closest("button[data-a],input[data-a]");if(!b)return;
   accion(b.getAttribute("data-id"),b.getAttribute("data-a"));
 });
 $("q").addEventListener("input",function(){S.q=this.value.trim();renderComida()});
+$("ord").addEventListener("change",function(){S.ord=this.value;renderComida()});
 $("seg").addEventListener("click",function(ev){
   var b=ev.target.closest("button[data-f]");if(!b)return;
   S.filtro=b.getAttribute("data-f");
